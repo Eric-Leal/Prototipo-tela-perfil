@@ -31,9 +31,33 @@ body {
     margin-right: 8px;
 }
 
+
 .dropdown-menu {
-    right: 0;
+    text-align: center;
+    background-color: #68ce4b;
+    max-width: 150px; /* Limita a largura do dropdown */
+    width: 100%; /* Ajusta a largura para 100% do container pai */
+    min-width: 100px; /* Define uma largura mínima */
+    overflow: hidden; /* Evita que o conteúdo exceda a área */
+    white-space: nowrap; /* Impede que o texto quebre para a linha seguinte */
+    text-overflow: ellipsis; /* Adiciona "..." se o texto for muito longo */
+    padding: 0;
+    margin: 0; 
 }
+.dropdown-item {
+    display: block; /* Para que ocupe a largura total */
+    width: 100%; /* O botão ocupará toda a largura do dropdown */
+    padding: 0; /* Remove padding para evitar espaços indesejados */
+    border: none; /* Remove bordas */
+    padding: 5px;
+    text-align: center; /* Centraliza o texto */
+    background-color: transparent; 
+}
+.dropdown-item:hover {
+    background-color: #ffffff; /* Cor de fundo ao passar o mouse */
+    color: #68ce4b; /* Cor do texto ao passar o mouse (opcional) */
+}
+
 
 /* Conteúdo Principal */
 .main {

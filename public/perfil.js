@@ -165,9 +165,24 @@ async function savePassword() {
 
 // Função para habilitar a edição da imagem de perfil
 function enableImageEdit() {
-    document.getElementById('imageUrl').style.display = 'inline';
-    document.getElementById('saveImageButton').style.display = 'inline';
+    const imageUrlInput = document.getElementById('imageUrl');
+    const saveImageButton = document.getElementById('saveImageButton');
+
+    // Verifica se o campo já está visível
+    if (imageUrlInput.style.display === 'inline') {
+        // Se estiver visível, oculta
+        imageUrlInput.style.display = 'none';
+        saveImageButton.style.display = 'none';
+    } else {
+        // Se não estiver visível, mostra
+        imageUrlInput.style.display = 'inline';
+        saveImageButton.style.display = 'inline';
+    }
 }
+
+document.getElementById('btnIconeLapis').addEventListener('click', enableImageEdit);
+document.getElementById('profileImage').addEventListener('click', enableImageEdit);
+
 
 // Função para salvar a nova imagem de perfil
 function saveProfileImage() {
@@ -188,3 +203,8 @@ function saveProfileImage() {
 
 // Chama a função para preencher os dados do usuário ao carregar a página
 window.onload = fillUserData;
+
+document.getElementById('logoutButton').onclick = function() {
+    localStorage.removeItem('loggedUser'); // Remove os dados do usuário logado
+    window.location.href = 'login.html'; // Redireciona para a página de login
+};

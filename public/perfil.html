@@ -46,8 +46,8 @@
                 <div class="d-flex align-items-center">
                     <div class="position-relative">
                         <button class="btn botao-fotoDePerfil">
-                            <img id="profileImage" src="https://via.placeholder.com/100" alt="Foto de perfil" class="rounded-circle">
-                            <button class="btn lapis-botao">
+                            <img id="profileImage" src="https://via.placeholder.com/100" alt="Foto de perfil" class="rounded-circle" >
+                            <button id="btnIconeLapis" class="btn lapis-botao " >
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
                         </button>
@@ -136,10 +136,7 @@
     <script src="perfil.js"></script>
     <script>
         // Função para lidar com o logout
-        document.getElementById('logoutButton').onclick = function() {
-            localStorage.removeItem('loggedUser'); // Remove os dados do usuário logado
-            window.location.href = 'login.html'; // Redireciona para a página de login
-        };
+        
     </script>
 </body>
 
