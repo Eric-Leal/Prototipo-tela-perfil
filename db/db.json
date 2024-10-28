@@ -1,0 +1,70 @@
+{
+    "usuarios": [
+      {
+        "id": 1,
+        "login": "admin",
+        "senha": "123",
+        "nome": "Administrador do Sistema",
+        "email": "admin@abc.com"
+      },
+      {
+        "id": 2,
+        "login": "user",
+        "senha": "123",
+        "nome": "Usuario Comum",
+        "email": "user@abc.com"
+      },
+      {
+        "id": 3,
+        "login": "rommel",
+        "senha": "123",
+        "nome": "Rommel",
+        "email": "rommel@gmail.com"
+      },
+      {
+        "id": 4,
+        "login": "eduarda",
+        "senha": "123",
+        "nome": "Eduarda Vieira",
+        "email": "eduarda@gmail.com"
+      },
+      {
+        "id": 5,
+        "login": "eric",
+        "senha": "123",
+        "nome": "Eric Leal",
+        "email": "eric@.com",
+        "telefone": "1234 4321",
+        "endereco": "teste23",
+        "imagem": "https://picsum.photos/200/300"
+      },
+      {
+        "id": 6,
+        "login": "beatriz",
+        "senha": "123",
+        "nome": "Beatriz Camila",
+        "email": "beatriz@gmail.com"
+      },
+      {
+        "id": 7,
+        "login": "gustavo",
+        "senha": "123",
+        "nome": "Gustavo Montanari",
+        "email": "gustavo@gmail.com"
+      },
+      {
+        "id": 8,
+        "login": "guilherme",
+        "senha": "123",
+        "nome": "Guilherme Marques",
+        "email": "guilherme@gmail.com"
+      },
+      {
+        "id": 9,
+        "login": "laura",
+        "senha": "123",
+        "nome": "Laura Pontara",
+        "email": "laura@gmail.com"
+      }
+    ]
+  }
