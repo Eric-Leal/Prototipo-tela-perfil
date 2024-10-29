@@ -1,210 +1,190 @@
-const loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
-const apiUrl = 'http://localhost:3000/usuarios'; // URL do seu servidor JSON
-let originalUserData; // Para armazenar os dados originais do usuário
+document.addEventListener('DOMContentLoaded', () => {
+    preencherCampos();
 
-function fillUserData() {
-    if (loggedUser) {
-        document.getElementById('cfgNome').value = loggedUser.nome;
-        document.getElementById('cfgEmail').value = loggedUser.email;
-        document.getElementById('cfgTelefone').value = loggedUser.telefone || '';
-        document.getElementById('cfgEndereço').value = loggedUser.endereco || '';
-        document.getElementById('headerUserName').innerText = loggedUser.nome; // Atualiza o nome no header
-        document.getElementById('usuarioNomeCompleto').textContent = loggedUser.nome;
-        document.getElementById('profileImage').src = loggedUser.imagem || 'https://via.placeholder.com/100';
-    }
-}
+    // Adiciona eventos aos botões
+    document.getElementById('btnEditarInfo').addEventListener('click', habilitarEdicao);
+    document.getElementById('btnSalvarInfo').addEventListener('click', salvarEdicoes);
+    document.getElementById('btnCancelarInfo').addEventListener('click', cancelarEdicoes);
+    document.getElementById('btnEditarSenha').addEventListener('click', habilitarEdicaoSenha);
+    document.getElementById('btnSalvarSenha').addEventListener('click', salvarSenha);
+    document.getElementById('btnCancelarSenha').addEventListener('click', cancelarEdicoesSenha);
+    document.getElementById('btnImagemPerfil').addEventListener('click', habilitarEdicaoImagem);
+    document.getElementById('btnSalvarImagem').addEventListener('click', salvarImagemPerfil);
+});
 
-// Função para habilitar ou desabilitar o modo de edição das informações pessoais
-function toggleEditInfo() {
-    const inputs = document.querySelectorAll('#cfgNome, #cfgEmail, #cfgTelefone, #cfgEndereço');
-    const saveButton = document.getElementById('saveInfoButton');
-    const cancelButton = document.getElementById('cancelInfoButton');
-    const editButton = document.getElementById('btnInformacoes');
-
-    if (saveButton.style.display === 'none') {
-        // Salva os dados originais para possível cancelamento
-        originalUserData = {
-            nome: document.getElementById('cfgNome').value,
-            email: document.getElementById('cfgEmail').value,
-            telefone: document.getElementById('cfgTelefone').value,
-            endereco: document.getElementById('cfgEndereço').value,
-        };
-
-        inputs.forEach(input => input.removeAttribute('disabled'));
-        saveButton.style.display = 'inline';
-        cancelButton.style.display = 'inline';
-        editButton.style.display = 'none'; // Esconde o botão "Editar"
+function preencherCampos() {
+    const usuario = JSON.parse(localStorage.getItem('usuarioCorrente'));
+    if (usuario) {
+        console.log("Usuário carregado:", usuario); // Log dos dados carregados
+        document.getElementById('cfgNome').value = usuario.nome;
+        document.getElementById('cfgEmail').value = usuario.email;
+        document.getElementById('cfgTelefone').value = usuario.telefone || ''; 
+        document.getElementById('cfgEndereço').value = usuario.endereco || ''; 
+        document.getElementById('usuarioPerfil').innerText = usuario.nome; // Atualiza nome do usuário no perfil
+        document.getElementById('headerNomeUsuario').innerText = usuario.nome; // Atualiza nome no header
+        document.getElementById('imagemPerfil').src = usuario.foto || 'https://via.placeholder.com/100'; // Atualiza imagem de perfil
+        document.getElementById('imagemHeader').src = usuario.foto || 'https://via.placeholder.com/100'; // Atualiza imagem de perfil
     } else {
-        inputs.forEach(input => input.setAttribute('disabled', 'disabled'));
-        saveButton.style.display = 'none';
-        cancelButton.style.display = 'none';
-        editButton.style.display = 'inline'; // Mostra o botão "Editar" novamente
+        alert("Usuário não encontrado.");
     }
+
+    desabilitarCampos();
 }
 
-// Função para cancelar a edição das informações
-function cancelEditInfo() {
-    document.getElementById('cfgNome').value = originalUserData.nome;
-    document.getElementById('cfgEmail').value = originalUserData.email;
-    document.getElementById('cfgTelefone').value = originalUserData.telefone;
-    document.getElementById('cfgEndereço').value = originalUserData.endereco;
+function habilitarEdicao() {
+    document.getElementById('cfgNome').disabled = false;
+    document.getElementById('cfgEmail').disabled = false;
+    document.getElementById('cfgTelefone').disabled = false;
+    document.getElementById('cfgEndereço').disabled = false;
 
-    toggleEditInfo(); // Fecha o modo de edição
+    // Esconde o botão Editar e mostra os botões Salvar e Cancelar
+    document.getElementById('btnEditarInfo').style.display = 'none';
+    document.getElementById('btnSalvarInfo').style.display = 'inline-block';
+    document.getElementById('btnCancelarInfo').style.display = 'inline-block';
 }
 
-// Função para salvar as informações pessoais
-async function saveProfile() {
-    const nome = document.getElementById('cfgNome').value;
-    const email = document.getElementById('cfgEmail').value;
-    const telefone = document.getElementById('cfgTelefone').value;
-    const endereco = document.getElementById('cfgEndereço').value;
+function salvarEdicoes() {
+    const usuario = JSON.parse(localStorage.getItem('usuarioCorrente'));
+    if (usuario) {
+        // Atualiza os dados do usuário
+        usuario.nome = document.getElementById('cfgNome').value;
+        usuario.email = document.getElementById('cfgEmail').value;
+        usuario.telefone = document.getElementById('cfgTelefone').value; 
+        usuario.endereco = document.getElementById('cfgEndereço').value; 
 
-    const updatedUser = {
-        ...loggedUser,
-        nome,
-        email,
-        telefone,
-        endereco,
-    };
+        console.log("Dados do usuário antes de salvar:", usuario); // Verifique os dados antes de salvar
 
-    localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
+        localStorage.setItem('usuarioCorrente', JSON.stringify(usuario)); // Salva as edições
 
-    try {
-        const response = await fetch(`${apiUrl}/${loggedUser.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedUser),
-        });
+        atualizarUsuarioNoBanco(usuario);
+        desabilitarCampos();
 
-        if (!response.ok) throw new Error('Erro ao salvar as informações.');
-
-        alert('Informações salvas com sucesso!');
-        location.reload(); // Recarrega a página para mostrar as mudanças
-    } catch (error) {
-        console.error(error);
-        alert('Erro ao salvar as informações.');
-    }
-}
-
-// Função para habilitar ou desabilitar o modo de edição da senha
-function toggleEditPassword() {
-    const passwordInputs = document.querySelectorAll('#senhaAtual, #novaSenha, #confirmaSenha');
-    const saveButton = document.getElementById('savePasswordButton');
-    const cancelButton = document.getElementById('cancelPasswordButton');
-    const editButton = document.getElementById('btnSenha');
-
-    if (saveButton.style.display === 'none') {
-        passwordInputs.forEach(input => input.removeAttribute('disabled'));
-        saveButton.style.display = 'inline';
-        cancelButton.style.display = 'inline';
-        editButton.style.display = 'none'; // Esconde o botão "Editar"
+        // Recarregue os dados após salvar
+        preencherCampos(); // Chame novamente para garantir que os dados estão atualizados na página
     } else {
-        passwordInputs.forEach(input => input.setAttribute('disabled', 'disabled'));
-        saveButton.style.display = 'none';
-        cancelButton.style.display = 'none';
-        editButton.style.display = 'inline'; // Mostra o botão "Editar" novamente
+        alert("Usuário não encontrado.");
     }
 }
 
-// Função para cancelar a edição da senha
-function cancelEditPassword() {
-    const passwordInputs = document.querySelectorAll('#senhaAtual, #novaSenha, #confirmaSenha');
-    passwordInputs.forEach(input => input.setAttribute('disabled', 'disabled'));
-
-    toggleEditPassword(); // Fecha o modo de edição
+function atualizarUsuarioNoBanco(usuario) {
+    const API_URL = '/usuarios/' + usuario.id;
+    fetch(API_URL, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(usuario), 
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao atualizar o usuário no banco de dados');
+        }
+        console.log('Usuário atualizado com sucesso');
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert("Erro ao atualizar o usuário.");
+    });
 }
 
-// Função para salvar a nova senha
-async function savePassword() {
+function cancelarEdicoes() {
+    preencherCampos();
+    desabilitarCampos();
+}
+
+function desabilitarCampos() {
+    document.getElementById('cfgNome').disabled = true;
+    document.getElementById('cfgEmail').disabled = true;
+    document.getElementById('cfgTelefone').disabled = true;
+    document.getElementById('cfgEndereço').disabled = true;
+
+    document.getElementById('btnSalvarInfo').style.display = 'none';
+    document.getElementById('btnCancelarInfo').style.display = 'none';
+    document.getElementById('btnEditarInfo').style.display = 'inline-block'; // Garante que o botão Editar apareça novamente
+}
+
+// Funções para editar senha
+function habilitarEdicaoSenha() {
+    document.getElementById('senhaAtual').disabled = false;
+    document.getElementById('novaSenha').disabled = false;
+    document.getElementById('confirmaSenha').disabled = false;
+
+    document.getElementById('btnEditarSenha').style.display = 'none';
+    document.getElementById('btnSalvarSenha').style.display = 'inline-block';
+    document.getElementById('btnCancelarSenha').style.display = 'inline-block';
+}
+
+function salvarSenha() {
+    const usuario = JSON.parse(localStorage.getItem('usuarioCorrente'));
     const senhaAtual = document.getElementById('senhaAtual').value;
     const novaSenha = document.getElementById('novaSenha').value;
     const confirmaSenha = document.getElementById('confirmaSenha').value;
 
-    if (!senhaAtual || !novaSenha || !confirmaSenha) {
-        alert('Por favor, preencha todos os campos de senha.');
+    if (usuario.senha !== senhaAtual) {
+        alert("Senha atual está incorreta.");
         return;
     }
-
     if (novaSenha !== confirmaSenha) {
-        alert('As senhas não conferem!');
+        alert("As novas senhas não coincidem.");
         return;
     }
 
-    if (senhaAtual !== loggedUser.senha) {
-        alert('A senha atual está incorreta!');
-        return;
-    }
+    usuario.senha = novaSenha;
+    localStorage.setItem('usuarioCorrente', JSON.stringify(usuario)); // Salva a nova senha
+    atualizarUsuarioNoBanco(usuario); // Atualiza no banco
 
-    const updatedUser = {
-        ...loggedUser,
-        senha: novaSenha,
-    };
-
-    localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
-
-    try {
-        const response = await fetch(`${apiUrl}/${loggedUser.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedUser),
-        });
-
-        if (!response.ok) throw new Error('Erro ao salvar a nova senha.');
-
-        alert('Senha atualizada com sucesso!');
-        location.reload(); // Recarrega a página para mostrar as mudanças
-    } catch (error) {
-        console.error(error);
-        alert('Erro ao salvar a nova senha.');
-    }
+    desabilitarCamposSenha();
+    preencherCampos(); // Atualiza os campos
 }
 
-// Função para habilitar a edição da imagem de perfil
-function enableImageEdit() {
-    const imageUrlInput = document.getElementById('imageUrl');
-    const saveImageButton = document.getElementById('saveImageButton');
+function cancelarEdicoesSenha() {
+    desabilitarCamposSenha();
+}
 
-    // Verifica se o campo já está visível
-    if (imageUrlInput.style.display === 'inline') {
-        // Se estiver visível, oculta
-        imageUrlInput.style.display = 'none';
-        saveImageButton.style.display = 'none';
+function desabilitarCamposSenha() {
+    document.getElementById('senhaAtual').disabled = true;
+    document.getElementById('novaSenha').disabled = true;
+    document.getElementById('confirmaSenha').disabled = true;
+
+    document.getElementById('btnSalvarSenha').style.display = 'none';
+    document.getElementById('btnCancelarSenha').style.display = 'none';
+    document.getElementById('btnEditarSenha').style.display = 'inline-block';
+}
+
+// Funções para editar a imagem de perfil
+function habilitarEdicaoImagem() {
+    const inputUrl = document.getElementById('imageUrl');
+    const btnSalvar = document.getElementById('btnSalvarImagem');
+
+    // Alterna a visibilidade do campo e do botão de salvar
+    if (inputUrl.style.display === 'none' || inputUrl.style.display === '') {
+        inputUrl.style.display = 'inline-block';
+        btnSalvar.style.display = 'inline-block';
+        // Desabilita a edição dos outros campos
+        desabilitarCampos();
     } else {
-        // Se não estiver visível, mostra
-        imageUrlInput.style.display = 'inline';
-        saveImageButton.style.display = 'inline';
+        inputUrl.style.display = 'none';
+        btnSalvar.style.display = 'none';
     }
 }
 
-document.getElementById('btnIconeLapis').addEventListener('click', enableImageEdit);
-document.getElementById('profileImage').addEventListener('click', enableImageEdit);
+function salvarImagemPerfil() {
+    const usuario = JSON.parse(localStorage.getItem('usuarioCorrente'));
+    const novaImagem = document.getElementById('imageUrl').value;
 
+    if (novaImagem) {
+        usuario.foto = novaImagem; // Atualiza a URL da imagem
+        localStorage.setItem('usuarioCorrente', JSON.stringify(usuario)); // Salva a nova imagem no localStorage
+        atualizarUsuarioNoBanco(usuario); // Atualiza no banco
 
-// Função para salvar a nova imagem de perfil
-function saveProfileImage() {
-    const imageUrl = document.getElementById('imageUrl').value;
-    if (!imageUrl) {
-        alert('Por favor, insira um link de imagem.');
-        return;
+        document.getElementById('imagemPerfil').src = novaImagem; // Atualiza a imagem na tela
+        document.getElementById('usuarioPerfil').innerText = usuario.nome; // Atualiza nome
+        document.getElementById('headerNomeUsuario').innerText = usuario.nome; // Atualiza nome no header
+
+        // Esconde o campo de URL e o botão de salvar
+        document.getElementById('imageUrl').style.display = 'none';
+        document.getElementById('btnSalvarImagem').style.display = 'none';
+    } else {
+        alert("Por favor, insira um link válido para a imagem.");
     }
-
-    document.getElementById('profileImage').src = imageUrl;
-    loggedUser.imagem = imageUrl;
-    localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-
-    alert('Imagem de perfil atualizada com sucesso!');
-    document.getElementById('imageUrl').style.display = 'none';
-    document.getElementById('saveImageButton').style.display = 'none';
 }
-
-// Chama a função para preencher os dados do usuário ao carregar a página
-window.onload = fillUserData;
-
-document.getElementById('logoutButton').onclick = function() {
-    localStorage.removeItem('loggedUser'); // Remove os dados do usuário logado
-    window.location.href = 'login.html'; // Redireciona para a página de login
-};
